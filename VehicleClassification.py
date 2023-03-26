@@ -121,19 +121,17 @@ while (cap.isOpened()):
                             new = False
                             i.updateCoords(cx, cy)
                             c = i.getR();
-
+                            class_n=""
 
                             if i.going_UP(line_down, line_up) == True:
                                 cnt_up += 1
                                 CTot += c
-                                # print("ID:",i.getId(),'crossed going up at', time.strftime("%c"))
                                 img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                                 # cv2.imwrite("cars/carsUP/" + str(cnt_up) + ".png",img[y:y + h - 1, x:x + w])
 
                             elif i.going_DOWN(line_down, line_up) == True:
                                 cnt_down += 1
                                 CTot += c
-                                # print("ID:", i.getId(), 'crossed going up at', time.strftime("%c"))
                                 # img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                                 # cv2.imwrite("cars/carsDOWN/" + str(cnt_up) + ".png",img[y:y + h - 1, x:x + w])
                                 img = cv2.resize(frame, (224, 224))
@@ -145,6 +143,8 @@ while (cap.isOpened()):
                                 class_name = classes[class_idx]
                                 font = cv2.FONT_HERSHEY_SIMPLEX
                                 print('class:', class_name)
+                                i.setCl(class_name)
+                                class_n = i.getCl()
                                 # cv2.putText(frame, class_name, (50, 50), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
                             break
                         if i.getState() == '1':
@@ -168,13 +168,11 @@ while (cap.isOpened()):
                 cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
                 # green rectangle
                 img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv2.putText(img, 'Co2:  ' + str(c), (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (36, 255, 12), 2)
+                cv2.putText(img, 'Co2:  ' + str(c) , (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (36, 255, 12), 2)
                 # Seperate cars
                 roi = frame[x:x + w, y:y + h]
                 file_name_path = 'cars/' + str(cnt_up) + '.jpg'
                 # cv2.imwrite(file_name_path, roi)
-
-
 
         # shows car id + coordinates
         for i in cars:

@@ -18,6 +18,13 @@ class Car:
         self.max_age=max_age
         self.dir=None
         self.r=random.randint(1,100)
+        self.cl = ""
+
+    def getCl(self):
+        return self.cl
+
+    def setCl(self,s):
+        self.cl = s
 
     def getRGB(self):  #For the RGB colour
         return (self.R,self.G,self.B)
