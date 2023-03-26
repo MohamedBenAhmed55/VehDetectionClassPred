@@ -121,14 +121,10 @@ while (cap.isOpened()):
                                 cnt_up += 1
                                 CTot += c
                                 # print("ID:",i.getId(),'crossed going up at', time.strftime("%c"))
-                                img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                                cv2.imwrite("cars/carsUP/" + str(cnt_up) + ".png",img[y:y + h - 1, x:x + w])
                             elif i.going_DOWN(line_down, line_up) == True:
                                 cnt_down += 1
                                 CTot += c
                                 # print("ID:", i.getId(), 'crossed going up at', time.strftime("%c"))
-                                img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                                cv2.imwrite("cars/carsDOWN/" + str(cnt_up) + ".png",img[y:y + h - 1, x:x + w])
                             break
                         if i.getState() == '1':
                             if i.getDir() == 'down' and i.getY() > down_limit:
@@ -146,18 +142,11 @@ while (cap.isOpened()):
                         pid += 1
                         print(pid)
 
-
                 # middle red circle
                 cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
                 # green rectangle
                 img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 cv2.putText(img, 'Co2:  ' + str(c), (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (36, 255, 12), 2)
-                # Seperate cars
-                roi = frame[x:x + w, y:y + h]
-                file_name_path = 'cars/' + str(cnt_up) + '.jpg'
-                # cv2.imwrite(file_name_path, roi)
-
-
 
         # shows car id + coordinates
         for i in cars:
@@ -183,8 +172,8 @@ while (cap.isOpened()):
 
         # opens video window
         cv2.imshow('Frame', frame)
-        cv2.imshow('Mask', mask)
-        cv2.imshow('Mask2', mask2)
+        # cv2.imshow('Mask', mask)
+        # cv2.imshow('Mask2', mask2)
 
         if cv2.waitKey(1) & 0xff == ord('q'):
             break
