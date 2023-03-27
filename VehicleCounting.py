@@ -86,8 +86,6 @@ while (cap.isOpened()):
         # __, mask = cv2.threshold(mask, 254, 255, cv2.THRESH_BINARY)
         mask2 = cv2.morphologyEx(imBin2, cv2.MORPH_CLOSE, kernalOp)
 
-        # new mask for vehicle recognition
-
         # Closing i.e First Dilate then Erode // transformation d'images
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.float32(kernalCl))
         mask2 = cv2.morphologyEx(mask2, cv2.MORPH_CLOSE, np.float32(kernalCl))
@@ -115,7 +113,6 @@ while (cap.isOpened()):
                             new = False
                             i.updateCoords(cx, cy)
                             c = i.getR();
-
 
                             if i.going_UP(line_down, line_up) == True:
                                 cnt_up += 1

@@ -16,17 +16,11 @@ data = list(collection.find({}))
 
 co = []
 d = []
+d2 = []
+co2 = []
 for doc in data:
     co.append(doc['Average CO2'])
     d.append(doc['date'])
-
-# for doc in data:
-#
-#     if doc['date'] >= datemin.strftime('%m/%d/%Y') and doc['date'] < datemax.strftime('%m/%d/%Y') :
-#         co.append(doc['Average CO2'])
-#         d.append(doc['date'])
-#     # d.append(doc['date'])
-
 
 df = pd.DataFrame({
     'date': d,
@@ -41,38 +35,40 @@ datemax = st.date_input(
     "to date",
     datetime.datetime.now().date())
 
-# dm = '2023-03-03'
-# dmx = '2023-03-03'
+date_format = "%Y-%m-%d"
 
-# def date_filter():
-#     return df['date'] > dm
+date1 = "2023-02-24"
+date2 = "2023-03-24"
+for doc in data:
+    date_string = doc['date']
+    date_obj = datetime.datetime.strptime(date_string, date_format)
 
-# # date1 = datetime.datetime.now().date()
-# date1 = datetime(2023, 3, 3)
-# query = {"date": {"$gte": date1}}
-# data2 = list(collection.find(query))
+    date_obj >= datetime.datetime.strptime(date1, date_format)
+    date_obj <= datetime.datetime.strptime(date2, date_format)
 
-# co2 = []
-# d2 = []
-# for doc in data2:
-#     co2.append(doc['Average CO2'])
-#     d2.append(doc['date'])
+    if date_obj >= datetime.datetime.strptime(date1, date_format) and date_obj <= datetime.datetime.strptime(date2, date_format)  :
+        co2.append(doc['Average CO2'])
+        d2.append(doc['date'])
+    # d.append(doc['date'])
 
-# dff = pd.DataFrame({
-#     'date': d,
-#     'Co2 emission per date': co
-# })
-#
-# dff = dff.rename(columns={'date': 'index'}).set_index('index')
-# dff
-# df = list(filter(lambda df: df['date'] >= date1, df))
-# filtered_documents = filter(lambda df: df["date"] >= '03-03-2023', df)
-# filtered_documents = list(filtered_documents)
-# filtered_documents = filtered_documents.rename(columns={'date': 'index'}).set_index('index')
+d2
+df2 = pd.DataFrame({
+    'date': d2,
+    'Co2 emission per date': co2
+})
+
+df2 = df2.rename(columns={'date': 'index'}).set_index('index')
+st.line_chart(df2)
+
 df = df.rename(columns={'date': 'index'}).set_index('index')
 st.line_chart(df)
 df
 # filtered_documents
+# def rerun():
+#     raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
+#
+# if st.button('Rerun'):
+#     rerun()
 
 uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:

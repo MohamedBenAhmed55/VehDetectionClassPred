@@ -72,6 +72,7 @@ max_p_age = 5
 pid = 1
 
 CTot = 0
+hn = pn = sen = sun = 0
 
 while (cap.isOpened()):
     ret, frame = cap.read()
@@ -88,10 +89,7 @@ while (cap.isOpened()):
 
         # OPening i.e First Erode then dilate
         mask = cv2.morphologyEx(imBin, cv2.MORPH_OPEN, kernalOp)
-        # __, mask = cv2.threshold(mask, 254, 255, cv2.THRESH_BINARY)
         mask2 = cv2.morphologyEx(imBin2, cv2.MORPH_CLOSE, kernalOp)
-
-        # new mask for vehicle recognition
 
         # Closing i.e First Dilate then Erode // transformation d'images
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.float32(kernalCl))
@@ -122,7 +120,6 @@ while (cap.isOpened()):
 
                             if i.going_UP(line_down, line_up) == True:
                                 cnt_up += 1
-                                CTot += c
                                 img = cv2.rectangle(frame, (x, y), (x + w - 1, y + h - 1), (0, 255, 0), 2)
                                 img = cv2.resize(img, (224, 224))
                                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -135,10 +132,22 @@ while (cap.isOpened()):
                                 # print('class:', class_name)
                                 i.setCl(class_name)
                                 class_n = i.getCl()
+                                if class_n == "hatchback":
+                                    hn += 1
+                                    i.setR(random.randint(5, 20))
+                                elif class_n == "pickup":
+                                    pn += 1
+                                    i.setR(random.randint(20, 40))
+                                elif class_n == "sedan":
+                                    sen += 1
+                                    i.setR(random.randint(40, 60))
+                                elif class_n == "suv":
+                                    sun += 1
+                                    i.setR(random.randint(60, 100))
+                                CTot += i.getR()
 
                             elif i.going_DOWN(line_down, line_up) == True:
                                 cnt_down += 1
-                                CTot += c
                                 img = cv2.rectangle(frame, (x, y), (x + w - 1, y + h - 1), (0, 255, 0), 2)
                                 img = cv2.resize(img, (224, 224))
                                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -150,10 +159,25 @@ while (cap.isOpened()):
                                 classif.append(class_name)
                                 class_n = class_name
                                 i.setCl(class_name)
-                                print('class:', class_name)
+                                # print('class:', class_name)
+                                if class_n == "hatchback":
+                                    hn += 1
+                                    i.setR(random.randint(5, 20))
+                                elif class_n == "pickup":
+                                    pn += 1
+                                    i.setR(random.randint(20, 40))
+                                elif class_n == "sedan":
+                                    sen += 1
+                                    i.setR(random.randint(40, 60))
+                                elif class_n == "suv":
+                                    sun += 1
+                                    i.setR(random.randint(60, 100))
+                                CTot += i.getR()
+                            c = i.getR()
                             class_n = i.getCl()
 
                             break
+
                         if i.getState() == '1':
                             if i.getDir() == 'down' and i.getY() > down_limit:
                                 i.setDone()
@@ -176,10 +200,6 @@ while (cap.isOpened()):
                 img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 cv2.putText(img, 'Co2:  ' + str(c) + " " + class_n, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
                             (36, 255, 12), 2)
-                # Seperate cars
-                # roi = frame[x:x + w, y:y + h]
-                # file_name_path = 'cars/' + str(cnt_up) + '.jpg'
-                # # cv2.imwrite(file_name_path, roi)
 
         # shows car id + coordinates
         for i in cars:
@@ -218,17 +238,24 @@ data = {
     "carcount": carn,
     "Average CO2": avgCo,
     "date": date,
-    "cars": classif
 }
 
-# json_string = json.dumps(data)
-# print(json_string)
-#
-# client = MongoClient("mongodb://localhost:27017/")
-# db = client["mydb"]
-# collection = db["mydb"]
-# collection.insert_one(data)
-print("size :" + str(len(classif)))
-print(classif)
+json_string = json.dumps(data)
+print(json_string)
+
+client = MongoClient("mongodb://localhost:27017/")
+db = client["mydb"]
+collection = db["mydb"]
+collection.insert_one(data)
+
+# print("size :" + str(len(classif)))
+# print(classif)
+# print(hn)
+# print(pn)
+# print(sen)
+# print(sun)
+# print(sun + hn + sen + pn)
+# print(avgCo)
+
 cap.release()
 cv2.destroyAllWindows()

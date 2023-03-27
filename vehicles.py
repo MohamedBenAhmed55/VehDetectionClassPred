@@ -20,6 +20,9 @@ class Car:
         self.r=random.randint(1,100)
         self.cl = ""
 
+    def setR(self,r):
+        self.r = r
+
     def getCl(self):
         return self.cl
 
