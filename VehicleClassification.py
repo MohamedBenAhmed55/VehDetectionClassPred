@@ -1,4 +1,3 @@
-
 import random
 import cv2
 import numpy as np
@@ -10,14 +9,14 @@ from pymongo import MongoClient
 import tensorflow as tf
 from tensorflow import keras
 
-#Loading the model
+# Loading the model
 model = keras.models.load_model('model')
 classes = ['hatchback', 'pickup', 'sedan', 'suv']
 
 cnt_up = 0
 cnt_down = 0
 r = 0
-
+classif = []
 cap = cv2.VideoCapture("videos/surveillance.m4v")
 # cap=cv2.VideoCapture("videos/videoplayback.mp4")
 # cap=cv2.VideoCapture("videos/video.mp4")
@@ -101,8 +100,6 @@ while (cap.isOpened()):
         # Find Contours
         countours0, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        # variables to contain the number of each vehicle type
-
         for cnt in countours0:
             area = cv2.contourArea(cnt)
 
@@ -113,6 +110,7 @@ while (cap.isOpened()):
                 cy = int(m['m01'] / m['m00'])
                 x, y, w, h = cv2.boundingRect(cnt)
                 c = 0
+                class_n = ""
 
                 new = True
                 if cy in range(up_limit, down_limit):
@@ -121,31 +119,40 @@ while (cap.isOpened()):
                             new = False
                             i.updateCoords(cx, cy)
                             c = i.getR();
-                            class_n=""
 
                             if i.going_UP(line_down, line_up) == True:
                                 cnt_up += 1
                                 CTot += c
-                                img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                                # cv2.imwrite("cars/carsUP/" + str(cnt_up) + ".png",img[y:y + h - 1, x:x + w])
-
-                            elif i.going_DOWN(line_down, line_up) == True:
-                                cnt_down += 1
-                                CTot += c
-                                # img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                                # cv2.imwrite("cars/carsDOWN/" + str(cnt_up) + ".png",img[y:y + h - 1, x:x + w])
-                                img = cv2.resize(frame, (224, 224))
+                                img = cv2.rectangle(frame, (x, y), (x + w - 1, y + h - 1), (0, 255, 0), 2)
+                                img = cv2.resize(img, (224, 224))
                                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                                 img = img.astype('float32') / 255.0
                                 img = np.expand_dims(img, axis=0)
                                 predictions = model.predict(img)
                                 class_idx = np.argmax(predictions[0])
                                 class_name = classes[class_idx]
-                                font = cv2.FONT_HERSHEY_SIMPLEX
-                                print('class:', class_name)
+                                classif.append(class_name)
+                                # print('class:', class_name)
                                 i.setCl(class_name)
                                 class_n = i.getCl()
-                                # cv2.putText(frame, class_name, (50, 50), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+
+                            elif i.going_DOWN(line_down, line_up) == True:
+                                cnt_down += 1
+                                CTot += c
+                                img = cv2.rectangle(frame, (x, y), (x + w - 1, y + h - 1), (0, 255, 0), 2)
+                                img = cv2.resize(img, (224, 224))
+                                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                                img = img.astype('float32') / 255.0
+                                img = np.expand_dims(img, axis=0)
+                                predictions = model.predict(img)
+                                class_idx = np.argmax(predictions[0])
+                                class_name = classes[class_idx]
+                                classif.append(class_name)
+                                class_n = class_name
+                                i.setCl(class_name)
+                                print('class:', class_name)
+                            class_n = i.getCl()
+
                             break
                         if i.getState() == '1':
                             if i.getDir() == 'down' and i.getY() > down_limit:
@@ -163,16 +170,16 @@ while (cap.isOpened()):
                         pid += 1
                         print(pid)
 
-
                 # middle red circle
                 cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
                 # green rectangle
                 img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv2.putText(img, 'Co2:  ' + str(c) , (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (36, 255, 12), 2)
+                cv2.putText(img, 'Co2:  ' + str(c) + " " + class_n, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
+                            (36, 255, 12), 2)
                 # Seperate cars
-                roi = frame[x:x + w, y:y + h]
-                file_name_path = 'cars/' + str(cnt_up) + '.jpg'
-                # cv2.imwrite(file_name_path, roi)
+                # roi = frame[x:x + w, y:y + h]
+                # file_name_path = 'cars/' + str(cnt_up) + '.jpg'
+                # # cv2.imwrite(file_name_path, roi)
 
         # shows car id + coordinates
         for i in cars:
@@ -196,8 +203,6 @@ while (cap.isOpened()):
 
         # opens video window
         cv2.imshow('Frame', frame)
-        # cv2.imshow('Mask', mask)
-        # cv2.imshow('Mask2', mask2)
 
         if cv2.waitKey(1) & 0xff == ord('q'):
             break
@@ -212,7 +217,8 @@ date = str(datetime.datetime.now().date())
 data = {
     "carcount": carn,
     "Average CO2": avgCo,
-    "date": date
+    "date": date,
+    "cars": classif
 }
 
 # json_string = json.dumps(data)
@@ -222,6 +228,7 @@ data = {
 # db = client["mydb"]
 # collection = db["mydb"]
 # collection.insert_one(data)
-
+print("size :" + str(len(classif)))
+print(classif)
 cap.release()
 cv2.destroyAllWindows()
