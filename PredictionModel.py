@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from pymongo import MongoClient
+import datetime
 
 # data = [{
 #     "carcount": 85,
@@ -268,8 +269,12 @@ for item in data:
 
 average_carcount = total_carcount / len(data)
 average_carcount = int(average_carcount)
+date = datetime.datetime.strptime(data[-1]['date'], "%Y-%m-%d")
+datebegin = date + datetime.timedelta(days=1, hours=0)
+dateend = date + datetime.timedelta(days=7, hours=0)
 
-
+date1 = datebegin.strftime('%Y-%m-%d')
+date2 = dateend.strftime('%Y-%m-%d')
 df['dayofyear'] = pd.to_datetime(df['date']).dt.dayofyear
 
 
@@ -278,7 +283,7 @@ model.fit(df[['carcount', 'dayofyear']], df['Average CO2'])
 
 
 future_carcount = average_carcount
-future_dates = pd.date_range('2023-04-21', '2023-04-28', freq='D')
+future_dates = pd.date_range(date1, date2, freq='D')
 future_dayofyear = future_dates.dayofyear
 future_predictions = model.predict(pd.DataFrame({'carcount': future_carcount, 'dayofyear': future_dayofyear}))
 

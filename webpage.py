@@ -22,6 +22,7 @@ for doc in data:
     co.append(doc['Average CO2'])
     d.append(doc['date'])
 
+
 df = pd.DataFrame({
     'date': d,
     'Co2 emission per date': co
@@ -36,6 +37,9 @@ datemax = st.date_input(
     datetime.datetime.now().date())
 
 date_format = "%Y-%m-%d"
+
+# date1 = "2023-02-24"
+# date2 = "2023-03-24"
 date1 = datemin.strftime('%Y-%m-%d')
 date2 = datemax.strftime('%Y-%m-%d')
 datemin = datetime.datetime.strptime(date1, date_format)
@@ -45,7 +49,7 @@ for doc in data:
     date_string = doc['date']
     date_obj = datetime.datetime.strptime(date_string, date_format)
 
-    if date_obj >= datemin and date_obj <= datemax:
+    if date_obj >= datemin and date_obj <= datemax  :
         co2.append(doc['Average CO2'])
         d2.append(doc['date'])
 
@@ -98,18 +102,19 @@ collection = db["mydb3"]
 
 data = list(collection.find({}))
 
-# Convert data to DataFrame
-# df = pd.DataFrame(data)
-
-pred = []
+pred= []
 for doc in data:
     date_string = doc['date']
     date_obj = datetime.datetime.strptime(date_string, date_format)
 
     if date_obj >= datemin and date_obj <= datemax:
-        pred.append(doc)
+        co2.append(doc['Prediction'])
+        d2.append(doc['date'])
 
-df2 = pd.DataFrame(pred)
+df2 = pd.DataFrame({
+    'date': d2,
+    'Prediction': co2
+})
 
 # Select relevant columns for plotting
 plot_data = df2[["Prediction", "date"]]
@@ -123,20 +128,21 @@ fig = px.line(plot_data, x="date", y=["Prediction"],
 # Display plot in Streamlit
 st.plotly_chart(fig)
 
-uploaded_file = st.file_uploader("Choose a file")
-if uploaded_file is not None:
-    # To read file as bytes:
-    bytes_data = uploaded_file.getvalue()
-    st.write(bytes_data)
 
-    # To convert to a string based IO:
-    stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-    st.write(stringio)
-
-    # To read file as string:
-    string_data = stringio.read()
-    st.write(string_data)
-
-    # Can be used wherever a "file-like" object is accepted:
-    dataframe = pd.read_csv(uploaded_file)
-    st.write(dataframe)
+# uploaded_file = st.file_uploader("Choose a file")
+# if uploaded_file is not None:
+#     # To read file as bytes:
+#     bytes_data = uploaded_file.getvalue()
+#     st.write(bytes_data)
+#
+#     # To convert to a string based IO:
+#     stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+#     st.write(stringio)
+#
+#     # To read file as string:
+#     string_data = stringio.read()
+#     st.write(string_data)
+#
+#     # Can be used wherever a "file-like" object is accepted:
+#     dataframe = pd.read_csv(uploaded_file)
+#     st.write(dataframe)
