@@ -1,10 +1,8 @@
 import streamlit as st
 from PIL import Image
 
-# Set page title and favicon
 st.set_page_config(page_title="Admin Dashboard", page_icon=":guardsman:")
 
-# Add a custom style to the page
 st.markdown(
     """
     <style>
@@ -32,11 +30,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Add a header image
 # image = Image.open("header.png")
 # st.image(image, use_column_width=True)
 
-# Add a title and description
 st.write(
     """
     # Admin Dashboard
@@ -44,24 +40,18 @@ st.write(
     """
 )
 
-# Enable/Disable prediction model toggle button
 enable_prediction = st.checkbox("Enable/Disable prediction model")
 
-# Train prediction model toggle button
 train_model = st.checkbox("Train prediction model")
 
-# Deactivate Driver Dashboard toggle button
 deactivate_dashboard = st.checkbox("Deactivate Driver Dashboard")
 
-# Add a separator
 st.write("---")
 
-# Display status of the toggle buttons
 st.write("## Status")
 st.write("Enable/Disable prediction model:", enable_prediction)
 st.write("Train prediction model:", train_model)
 st.write("Deactivate Driver Dashboard:", deactivate_dashboard)
 
-# Add a footer image
 # image = Image.open("footer.png")
 # st.image(image, use_column_width=True)
