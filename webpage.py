@@ -36,21 +36,18 @@ datemax = st.date_input(
     datetime.datetime.now().date())
 
 date_format = "%Y-%m-%d"
-
-date1 = "2023-02-24"
-date2 = "2023-03-24"
+date1 = datemin.strftime('%Y-%m-%d')
+date2 = datemax.strftime('%Y-%m-%d')
+datemin = datetime.datetime.strptime(date1, date_format)
+datemax = datetime.datetime.strptime(date2, date_format)
 
 for doc in data:
     date_string = doc['date']
     date_obj = datetime.datetime.strptime(date_string, date_format)
 
-    # date_obj >= datetime.datetime.strptime(date1, date_format)
-    # date_obj <= datetime.datetime.strptime(date2, date_format)
-
-    if date_obj >= datetime.datetime.strptime(date1, date_format) and date_obj <= datetime.datetime.strptime(date2, date_format)  :
+    if date_obj >= datemin and date_obj <= datemax:
         co2.append(doc['Average CO2'])
         d2.append(doc['date'])
-    # d.append(doc['date'])
 
 # d2
 df2 = pd.DataFrame({
@@ -64,17 +61,8 @@ st.line_chart(df2)
 df = df.rename(columns={'date': 'index'}).set_index('index')
 st.line_chart(df)
 df
-# filtered_documents
-# def rerun():
-#     raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
-#
-# if st.button('Rerun'):
-#     rerun()
-
 
 st.header('Data Visualisation for Co2 Emission per car type')
-client = MongoClient("mongodb://localhost:27017/")
-db = client["mydb"]
 collection = db["mydb2"]
 
 data = list(collection.find({}))
@@ -82,8 +70,19 @@ data = list(collection.find({}))
 # Convert data to DataFrame
 df = pd.DataFrame(data)
 
+car = []
+
+for doc in data:
+    date_string = doc['date']
+    date_obj = datetime.datetime.strptime(date_string, date_format)
+
+    if date_obj >= datemin and date_obj <= datemax:
+        car.append(doc)
+
+df2 = pd.DataFrame(car)
+
 # Select relevant columns for plotting
-plot_data = df[["hatchback Co2", "pickup Co2", "sedan Co2", "suv Co2", "Average CO2", "date"]]
+plot_data = df2[["hatchback Co2", "pickup Co2", "sedan Co2", "suv Co2", "Average CO2", "date"]]
 
 # Create plot with Plotly
 fig = px.line(plot_data, x="date", y=["hatchback Co2", "pickup Co2", "sedan Co2", "suv Co2", "Average CO2"],
@@ -94,6 +93,35 @@ fig = px.line(plot_data, x="date", y=["hatchback Co2", "pickup Co2", "sedan Co2"
 # Display plot in Streamlit
 st.plotly_chart(fig)
 
+st.header('Data Visualisation for Co2 Emission Predicted in the next week')
+collection = db["mydb3"]
+
+data = list(collection.find({}))
+
+# Convert data to DataFrame
+# df = pd.DataFrame(data)
+
+pred = []
+for doc in data:
+    date_string = doc['date']
+    date_obj = datetime.datetime.strptime(date_string, date_format)
+
+    if date_obj >= datemin and date_obj <= datemax:
+        pred.append(doc)
+
+df2 = pd.DataFrame(pred)
+
+# Select relevant columns for plotting
+plot_data = df2[["Prediction", "date"]]
+
+# Create plot with Plotly
+fig = px.line(plot_data, x="date", y=["Prediction"],
+              labels={"value": "CO2 Emissions (g/km)", "date": "Date"},
+              title="CO2 Emissions in the next week",
+              width=800, height=500)
+
+# Display plot in Streamlit
+st.plotly_chart(fig)
 
 uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:
