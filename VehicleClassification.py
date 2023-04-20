@@ -17,9 +17,9 @@ cnt_up = 0
 cnt_down = 0
 r = 0
 classif = []
-cap = cv2.VideoCapture("videos/surveillance.m4v")
+# cap = cv2.VideoCapture("videos/surveillance.m4v")
 # cap=cv2.VideoCapture("videos/videoplayback.mp4")
-# cap=cv2.VideoCapture("videos/video.mp4")
+cap=cv2.VideoCapture("videos/video.mp4")
 # cap=cv2.VideoCapture("videos/video1.mp4")
 
 # Get width and height of video
@@ -72,7 +72,7 @@ max_p_age = 5
 pid = 1
 
 CTot = 0
-hn = pn = sen = sun = 0
+hn = pn = sen = sun = hnc = pnc = senc = sunc = 0
 
 while (cap.isOpened()):
     ret, frame = cap.read()
@@ -135,15 +135,19 @@ while (cap.isOpened()):
                                 if class_n == "hatchback":
                                     hn += 1
                                     i.setR(random.randint(5, 20))
+                                    hnc += i.getR()
                                 elif class_n == "pickup":
                                     pn += 1
                                     i.setR(random.randint(20, 40))
+                                    pnc += i.getR()
                                 elif class_n == "sedan":
                                     sen += 1
                                     i.setR(random.randint(40, 60))
+                                    senc += i.getR()
                                 elif class_n == "suv":
                                     sun += 1
                                     i.setR(random.randint(60, 100))
+                                    sunc += i.getR()
                                 CTot += i.getR()
 
                             elif i.going_DOWN(line_down, line_up) == True:
@@ -163,15 +167,19 @@ while (cap.isOpened()):
                                 if class_n == "hatchback":
                                     hn += 1
                                     i.setR(random.randint(5, 20))
+                                    hnc += i.getR()
                                 elif class_n == "pickup":
                                     pn += 1
                                     i.setR(random.randint(20, 40))
+                                    pnc += i.getR()
                                 elif class_n == "sedan":
                                     sen += 1
                                     i.setR(random.randint(40, 60))
+                                    senc += i.getR()
                                 elif class_n == "suv":
                                     sun += 1
                                     i.setR(random.randint(60, 100))
+                                    sunc+= i.getR()
                                 CTot += i.getR()
                             c = i.getR()
                             class_n = i.getCl()
@@ -234,8 +242,39 @@ while (cap.isOpened()):
 carn = cnt_up + cnt_down
 avgCo = CTot / carn
 date = str(datetime.datetime.now().date())
+
+hanc = panc = sanc = savc = 0
+
+if (hn != 0):
+    hanc = hnc / hn
+else:
+    hanc = 0
+
+if (pn != 0):
+    panc = pnc / pn
+else:
+    panc = 0
+
+if (sen != 0):
+    sanc = senc / sen
+else:
+    sanc = 0
+
+if (sun != 0):
+    savc = sunc / sun
+else:
+    savc = 0
+
 data = {
     "carcount": carn,
+    "hatchback": hn,
+    "hatchback Co2": hanc,
+    "pickup": pn,
+    "pickup Co2": panc,
+    "sedan": sen,
+    "sedan Co2": sanc,
+    "suv": sun,
+    "suv Co2": savc,
     "Average CO2": avgCo,
     "date": date,
 }
@@ -245,7 +284,7 @@ print(json_string)
 
 client = MongoClient("mongodb://localhost:27017/")
 db = client["mydb"]
-collection = db["mydb"]
+collection = db["mydb2"]
 collection.insert_one(data)
 
 # print("size :" + str(len(classif)))

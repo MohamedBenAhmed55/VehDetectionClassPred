@@ -1,4 +1,3 @@
-
 import random
 import cv2
 import numpy as np
@@ -149,8 +148,6 @@ while (cap.isOpened()):
         for i in cars:
             cv2.putText(frame, str(i.getId()), (i.getX(), i.getY()), font, 0.3, i.getRGB(), 1, cv2.LINE_AA)
 
-
-
         # init Car numbers
         str_up = 'UP: ' + str(cnt_up)
         str_down = 'DOWN: ' + str(cnt_down)
@@ -171,6 +168,14 @@ while (cap.isOpened()):
         cv2.imshow('Frame', frame)
         # cv2.imshow('Mask', mask)
         # cv2.imshow('Mask2', mask2)
+        # cv2.imshow('fgmask', fgmask)
+        # cv2.imshow('fgmask2', fgmask2)
+
+        # cv2.resizeWindow('Frame',500,400)
+        # cv2.resizeWindow('Mask',500,400)
+        # cv2.resizeWindow('Mask2',500,400)
+        # cv2.resizeWindow('fgmask',500,400)
+        # cv2.resizeWindow('fgmask2',500,400)
 
         if cv2.waitKey(1) & 0xff == ord('q'):
             break
