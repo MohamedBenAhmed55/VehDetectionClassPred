@@ -11,10 +11,16 @@ cnt_up = 0
 cnt_down = 0
 r = 0
 
+# Load video
 cap = cv2.VideoCapture("videos/surveillance.m4v")
 # cap=cv2.VideoCapture("videos/videoplayback.mp4")
 # cap=cv2.VideoCapture("videos/video.mp4")
 # cap=cv2.VideoCapture("videos/video1.mp4")
+
+# Connect to database
+client = MongoClient("mongodb://localhost:27017/")
+db = client["mydb"]
+collection = db["mydb"]
 
 # Get width and height of video
 
@@ -92,7 +98,6 @@ while (cap.isOpened()):
         # Find Contours
         countours0, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        # variables to contain the number of each vehicle type
 
         for cnt in countours0:
             area = cv2.contourArea(cnt)
@@ -111,7 +116,7 @@ while (cap.isOpened()):
                         if abs(x - i.getX()) <= w and abs(y - i.getY()) <= h:
                             new = False
                             i.updateCoords(cx, cy)
-                            c = i.getR();
+                            c = i.getR()
 
                             if i.going_UP(line_down, line_up) == True:
                                 cnt_up += 1
@@ -196,9 +201,6 @@ data = {
 json_string = json.dumps(data)
 print(json_string)
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["mydb"]
-collection = db["mydb"]
 collection.insert_one(data)
 
 cap.release()

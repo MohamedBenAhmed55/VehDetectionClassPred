@@ -62,11 +62,13 @@ df2 = pd.DataFrame({
 df2 = df2.rename(columns={'date': 'index'}).set_index('index')
 st.line_chart(df2)
 
-df = df.rename(columns={'date': 'index'}).set_index('index')
-st.line_chart(df)
-df
+df2
 
-st.header('Data Visualisation for Co2 Emission per car type')
+# df = df.rename(columns={'date': 'index'}).set_index('index')
+# st.line_chart(df)
+# df
+
+st.header('Data Visualisation for Co2 Emission per vehicle type')
 collection = db["mydb2"]
 
 data = list(collection.find({}))
@@ -96,6 +98,8 @@ fig = px.line(plot_data, x="date", y=["hatchback Co2", "pickup Co2", "sedan Co2"
 
 # Display plot in Streamlit
 st.plotly_chart(fig)
+plot_data
+
 
 st.header('Data Visualisation for Co2 Emission Predicted in the next week')
 collection = db["mydb3"]
@@ -103,17 +107,19 @@ collection = db["mydb3"]
 data = list(collection.find({}))
 
 pred= []
+co22 =[]
+d3 = []
 for doc in data:
     date_string = doc['date']
     date_obj = datetime.datetime.strptime(date_string, date_format)
 
     if date_obj >= datemin and date_obj <= datemax:
-        co2.append(doc['Prediction'])
-        d2.append(doc['date'])
+        co22.append(doc['Prediction'])
+        d3.append(doc['date'])
 
 df2 = pd.DataFrame({
-    'date': d2,
-    'Prediction': co2
+    'date': d3,
+    'Prediction': co22
 })
 
 # Select relevant columns for plotting
@@ -127,7 +133,7 @@ fig = px.line(plot_data, x="date", y=["Prediction"],
 
 # Display plot in Streamlit
 st.plotly_chart(fig)
-
+df2
 
 # uploaded_file = st.file_uploader("Choose a file")
 # if uploaded_file is not None:

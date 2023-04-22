@@ -9,18 +9,27 @@ from pymongo import MongoClient
 import tensorflow as tf
 from tensorflow import keras
 
-# Loading the model
-model = keras.models.load_model('model')
-classes = ['hatchback', 'pickup', 'sedan', 'suv']
+
 
 cnt_up = 0
 cnt_down = 0
 r = 0
 classif = []
+
+#Load Video
 # cap = cv2.VideoCapture("videos/surveillance.m4v")
-# cap=cv2.VideoCapture("videos/videoplayback.mp4")
-cap=cv2.VideoCapture("videos/video.mp4")
-# cap=cv2.VideoCapture("videos/video1.mp4")
+# cap = cv2.VideoCapture("videos/videoplayback.mp4")
+cap = cv2.VideoCapture("videos/video.mp4")
+# cap = cv2.VideoCapture("videos/video1.mp4")
+
+# Loading the model
+model = keras.models.load_model('model')
+classes = ['hatchback', 'pickup', 'sedan', 'suv']
+
+# connect to database
+client = MongoClient("mongodb://localhost:27017/")
+db = client["mydb"]
+collection = db["mydb2"]
 
 # Get width and height of video
 
@@ -179,7 +188,7 @@ while (cap.isOpened()):
                                 elif class_n == "suv":
                                     sun += 1
                                     i.setR(random.randint(60, 100))
-                                    sunc+= i.getR()
+                                    sunc += i.getR()
                                 CTot += i.getR()
                             c = i.getR()
                             class_n = i.getCl()
@@ -282,9 +291,6 @@ data = {
 json_string = json.dumps(data)
 print(json_string)
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["mydb"]
-collection = db["mydb2"]
 collection.insert_one(data)
 
 # print("size :" + str(len(classif)))
