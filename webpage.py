@@ -7,6 +7,7 @@ from io import StringIO
 import datetime
 import plotly.express as px
 
+st.set_page_config(page_title="Driver Dashboard", page_icon=":guardsman:")
 st.header('Data Visualisation for Co2 Emission')
 client = MongoClient("mongodb://localhost:27017/")
 db = client["mydb"]
@@ -21,7 +22,6 @@ co2 = []
 for doc in data:
     co.append(doc['Average CO2'])
     d.append(doc['date'])
-
 
 df = pd.DataFrame({
     'date': d,
@@ -61,7 +61,6 @@ df2 = pd.DataFrame({
 
 df2 = df2.rename(columns={'date': 'index'}).set_index('index')
 st.line_chart(df2)
-
 df2
 
 # df = df.rename(columns={'date': 'index'}).set_index('index')
@@ -70,10 +69,7 @@ df2
 
 st.header('Data Visualisation for Co2 Emission per vehicle type')
 collection = db["mydb2"]
-
 data = list(collection.find({}))
-
-# Convert data to DataFrame
 df = pd.DataFrame(data)
 
 car = []
@@ -87,19 +83,13 @@ for doc in data:
 
 df2 = pd.DataFrame(car)
 
-# Select relevant columns for plotting
 plot_data = df2[["hatchback Co2", "pickup Co2", "sedan Co2", "suv Co2", "Average CO2", "date"]]
-
-# Create plot with Plotly
 fig = px.line(plot_data, x="date", y=["hatchback Co2", "pickup Co2", "sedan Co2", "suv Co2", "Average CO2"],
               labels={"value": "CO2 Emissions (g/km)", "date": "Date"},
               title="CO2 Emissions by Car Type",
               width=800, height=500)
-
-# Display plot in Streamlit
 st.plotly_chart(fig)
 plot_data
-
 
 st.header('Data Visualisation for Co2 Emission Predicted in the next week')
 collection = db["mydb3"]
@@ -122,16 +112,11 @@ df2 = pd.DataFrame({
     'Prediction': co22
 })
 
-# Select relevant columns for plotting
 plot_data = df2[["Prediction", "date"]]
-
-# Create plot with Plotly
 fig = px.line(plot_data, x="date", y=["Prediction"],
               labels={"value": "CO2 Emissions (g/km)", "date": "Date"},
               title="CO2 Emissions in the next week",
               width=800, height=500)
-
-# Display plot in Streamlit
 st.plotly_chart(fig)
 df2
 
